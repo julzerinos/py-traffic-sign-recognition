@@ -1,0 +1,3 @@
+1. create virtualenv as .venv ($ virtualenv -p python3 .venv)
+2. download GTSRB_Final_Training_Images.zip from https://sid.erda.dk/public/archives/daaeac0d7ce1152aea9b61d9f1e19370/published-archive.html
+3. save images from zip as dataset/german/xxxxx (folders from Images in zip)
