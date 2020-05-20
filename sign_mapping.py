@@ -1,4 +1,4 @@
-mapping = {
+german_mapping = {
     # id : sign name
     '00000': "Speed limit (20km/h)",
     '00001': "Speed limit (30km/h)",
