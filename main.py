@@ -8,8 +8,13 @@ import numpy as np
 
 from imutils import rotate_bound
 
-import tensorflow as tf
-from tensorflow.compat.v1.layers import flatten
+import matplotlib.pyplot as plt
+import random
+
+from tqdm import tqdm
+from scipy import ndimage
+#import tensorflow as tf
+#from tensorflow.compat.v1.layers import flatten
 from sklearn.model_selection import train_test_split
 
 from sign_mapping import german_mapping as mapping
@@ -139,6 +144,52 @@ def show_set(set):
         elif key == ord('c'):
             break
 
+def augment_brightness_camera_images(image):
+    image1 = cv.cvtColor(image,cv.COLOR_RGB2HSV)
+    random_bright = .25+np.random.uniform()
+    image1[:,:,2] = image1[:,:,2]*random_bright
+    image1 = cv.cvtColor(image1,cv.COLOR_HSV2RGB)
+    return image1
+
+def transform_image(img):    
+    ang_range = 25
+    ang_rot = np.random.uniform(ang_range)-ang_range/2
+    rows,cols,ch = img.shape    
+    Rot_M = cv.getRotationMatrix2D((cols/2,rows/2),ang_rot,1)
+        
+    img = cv.warpAffine(img,Rot_M,(cols,rows))    
+    img = augment_brightness_camera_images(img)
+    
+    return img
+##cos sie zepsulo i nie slychac tutaj
+def get_random_image_of_given_label(images_set, labels_set, label):
+    numpy_indexes = np.array(labels_set)
+    image_indexes = list(numpy_indexes).index(label)
+    rand_index = random.randint(0, np.bincount(labels_set)[label] - 1)
+    return images_set[image_indexes][rand_index]
+
+def equalize_samples_set(X_set, y_set):
+    labels_count_arr = np.bincount(y_set)
+    labels_bins = np.arange(len(labels_count_arr))
+    
+    ind = 0    
+   
+    for label in tqdm(labels_bins):        
+        labels_no_to_add =  int(np.mean(labels_count_arr)) * 4 - labels_count_arr[label]
+        
+        ind = ind + 1
+        X_temp = []
+        y_temp = []
+        
+        for num in range(labels_no_to_add):      
+            rand_image = get_random_image_of_given_label(X_set, y_set, label)
+            X_temp.append(transform_image(rand_image))
+            y_temp.append(label)            
+   
+        X_set = np.append(X_set, np.array(X_temp), axis=0)
+        y_set = np.append(y_set, np.array(y_temp), axis=0)
+        
+    return X_set, y_set
 
 if __name__ == '__main__':
 
@@ -168,7 +219,11 @@ if __name__ == '__main__':
         train_set, train_set_labels, \
         valid_set, valid_set_labels = prepare_data()
 
-    show_set(test_set)
+    #show_set(test_set)
+
+    train_set, train_set_labels = equalize_samples_set(train_set, train_set_labels)
+    
+ 
 
     # Step 2: Dataset Summary & Exploration (not necessary?)
     # number of training/validation/test examples etc
