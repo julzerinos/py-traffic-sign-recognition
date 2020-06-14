@@ -1,3 +1,7 @@
 dataset/
 .venv/
 __pycache__/
+data/
+.venvp37/
+lenet*
+checkpoint
