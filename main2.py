@@ -16,6 +16,9 @@
 
 # Load pickled data
 import pickle
+import numpy as np
+import matplotlib.pyplot as plt
+import random
 
 validation_file = "./data/valid.p"
 training_file = "./data/train.p"
@@ -48,7 +51,7 @@ X_test, y_test = test['features'], test['labels']
 
 # <codecell>
 
-import numpy as np
+# import numpy as np
 
 n_train = X_train.shape[0]
 n_valid = X_valid.shape[0]
@@ -57,45 +60,44 @@ image_shape = X_train.shape[1:]
 
 n_classes = np.unique(y_train).shape[0]
 
-print("Number of training examples =", n_train)
-print("Number of validation examples =", n_valid)
-print("Number of testing examples =", n_test)
-print("Image data shape =", image_shape)
-print("Number of classes =", n_classes)
+# print("Number of training examples =", n_train)
+# print("Number of validation examples =", n_valid)
+# print("Number of testing examples =", n_test)
+# print("Image data shape =", image_shape)
+# print("Number of classes =", n_classes)
 
-# <markdowncell>
-# ### Include an exploratory visualization of the dataset
+# # <markdowncell>
+# # ### Include an exploratory visualization of the dataset
 
-# <codecell>
+# # <codecell>
 
-import numpy as np
-import matplotlib.pyplot as plt
-import random
+# import numpy as np
+ 
 
-# Visualizations will be shown in the notebook.
+# # Visualizations will be shown in the notebook.
 
-def draw_images_examples(image_array, grid_x, grid_y, title):
-    fig = plt.figure(figsize=(grid_x,grid_y))
-    fig.suptitle(title, fontsize=20)
+# def draw_images_examples(image_array, grid_x, grid_y, title):
+#     fig = plt.figure(figsize=(grid_x,grid_y))
+#     fig.suptitle(title, fontsize=20)
 
-    for i in range(1,grid_y*grid_x+1):
-        index = random.randint(0, len(image_array))
-        image = image_array[index].squeeze()
+#     for i in range(1,grid_y*grid_x+1):
+#         index = random.randint(0, len(image_array))
+#         image = image_array[index].squeeze()
 
-        plt.subplot(grid_y,grid_x,i)
-        plt.imshow(image)
+#         plt.subplot(grid_y,grid_x,i)
+#         plt.imshow(image)
 
-# draw_images_examples(X_train, 16, 4, 'Examples of images from training set')
+# # draw_images_examples(X_train, 16, 4, 'Examples of images from training set')
 
 
-fig = plt.figure(figsize=(12,4))
-n, bins, patches = plt.hist(y_train, n_classes)
-plt.xlabel('Labels')
-plt.ylabel('No. of samples')
-plt.title('Histogram of training samples')
+# fig = plt.figure(figsize=(12,4))
+# n, bins, patches = plt.hist(y_train, n_classes)
+# plt.xlabel('Labels')
+# plt.ylabel('No. of samples')
+# plt.title('Histogram of training samples')
 
-X_train_one_label = X_train[np.where(y_train==0)]
-# draw_images_examples(X_train_one_label, 16, 4, 'Examples of images of the same type - Speed limit (20km/h)')
+# X_train_one_label = X_train[np.where(y_train==0)]
+# # draw_images_examples(X_train_one_label, 16, 4, 'Examples of images of the same type - Speed limit (20km/h)')
 
 # <markdowncell>
 # ## Step 2: Design and Test a Model Architecture
@@ -156,24 +158,24 @@ def equalize_samples_set(X_set, y_set):
 
 X_train, y_train = equalize_samples_set(X_train, y_train)
 
-n, bins, patches = plt.hist(y_train, n_classes)
-plt.xlabel('Labels')
-plt.ylabel('No. of samples')
-plt.title('Equalized histogram of train samples')
-plt.show()
+# n, bins, patches = plt.hist(y_train, n_classes)
+# plt.xlabel('Labels')
+# plt.ylabel('No. of samples')
+# plt.title('Equalized histogram of train samples')
+# plt.show()
 
-print("Train set increased from {} to {}".format(n_train,X_train.shape[0]))
+# print("Train set increased from {} to {}".format(n_train,X_train.shape[0]))
 
 
-plt.imshow(X_train[1000])
+# plt.imshow(X_train[1000])
 
-grid_len = 4
-plt.figure(figsize=(grid_len,grid_len))
+# grid_len = 4
+# plt.figure(figsize=(grid_len,grid_len))
 
-for i in range(1,grid_len*grid_len+1):
-    image = transform_image(X_train[1000], 20,10,5)
-    plt.subplot(grid_len,grid_len,i)
-    plt.imshow(image)
+# for i in range(1,grid_len*grid_len+1):
+#     image = transform_image(X_train[1000], 20,10,5)
+#     plt.subplot(grid_len,grid_len,i)
+#     plt.imshow(image)
 
 
 # <markdowncell>
@@ -214,14 +216,14 @@ X_test_processed = preprocess_batch(X_test)
 
 sample_image = X_train[1000]
 sample_image_processed = grayscale(X_train[1000])
-plt.figure(figsize=(16,3))
-plt.subplot(131)
-plt.imshow(sample_image)
-plt.subplot(132)
-plt.imshow(sample_image_processed.squeeze(), cmap='gray')
+#plt.figure(figsize=(16,3))
+#plt.subplot(131)
+#plt.imshow(sample_image)
+#plt.subplot(132)
+#plt.imshow(sample_image_processed.squeeze(), cmap='gray')
 
-print("Sample image dimension BEFORE processing: {}".format(sample_image.shape))
-print("Sample image dimension AFTER processing: {}".format(sample_image_processed.shape))
+#print("Sample image dimension BEFORE processing: {}".format(sample_image.shape))
+#print("Sample image dimension AFTER processing: {}".format(sample_image_processed.shape))
 
 image_depth = X_train_processed.shape[3]
 
@@ -229,8 +231,8 @@ dim1 = sample_image.shape[0]
 dim2 = sample_image.shape[1]
 dim3 = sample_image.shape[2]
 sample_image_reshaped = np.reshape(sample_image, dim1*dim2*dim3)
-plt.figure(figsize=(16,3))
-plt.subplot(131)
+#plt.figure(figsize=(16,3))
+#plt.subplot(131)
 n, bins, patches = plt.hist(sample_image_reshaped, 255)
 
 sample_image_processed =X_train_processed[1000]
@@ -238,8 +240,8 @@ dim1 = sample_image_processed.shape[0]
 dim2 = sample_image_processed.shape[1]
 dim3 = sample_image_processed.shape[2]
 sample_image_processed_reshaped = np.reshape(sample_image_processed, dim1*dim2*dim3)
-plt.subplot(132)
-n, bins, patches = plt.hist(sample_image_processed_reshaped,255)
+#plt.subplot(132)
+#n, bins, patches = plt.hist(sample_image_processed_reshaped,255)
 
 # <markdowncell>
 # ### Model Architecture
