@@ -20,6 +20,15 @@ import numpy as np
 import matplotlib.pyplot as plt
 import random
 
+import tensorflow as tf
+from tensorflow.contrib.layers import flatten
+
+from tqdm import tqdm
+# from scipy import ndimage
+import cv2
+
+from sklearn.utils import shuffle
+
 validation_file = "./data/valid.p"
 training_file = "./data/train.p"
 testing_file = "./data/test.p"
@@ -72,7 +81,7 @@ n_classes = np.unique(y_train).shape[0]
 # # <codecell>
 
 # import numpy as np
- 
+
 
 # # Visualizations will be shown in the notebook.
 
@@ -106,31 +115,32 @@ n_classes = np.unique(y_train).shape[0]
 
 # <codecell>
 
-from tqdm import tqdm
-from scipy import ndimage
-import cv2
+
 
 def augment_brightness_camera_images(image):
-    image1 = cv2.cvtColor(image,cv2.COLOR_RGB2HSV)
-    random_bright = .25+np.random.uniform()
-    image1[:,:,2] = image1[:,:,2]*random_bright
-    image1 = cv2.cvtColor(image1,cv2.COLOR_HSV2RGB)
+    image1 = cv2.cvtColor(image, cv2.COLOR_RGB2HSV)
+    random_bright = .25 + np.random.uniform()
+    image1[:, :, 2] = image1[:, :, 2]*random_bright
+    image1 = cv2.cvtColor(image1, cv2.COLOR_HSV2RGB)
     return image1
 
-def transform_image(img,ang_range,shear_range,trans_range):
-    ang_rot = np.random.uniform(ang_range)-ang_range/2
-    rows,cols,ch = img.shape
-    Rot_M = cv2.getRotationMatrix2D((cols/2,rows/2),ang_rot,1)
 
-    img = cv2.warpAffine(img,Rot_M,(cols,rows))
+def transform_image(img,ang_range, shear_range, trans_range):
+    ang_rot = np.random.uniform(ang_range)-ang_range/2
+    rows, cols, ch = img.shape
+    Rot_M = cv2.getRotationMatrix2D((cols/2, rows/2), ang_rot, 1)
+
+    img = cv2.warpAffine(img,Rot_M, (cols, rows))
     img = augment_brightness_camera_images(img)
 
     return img
+
 
 def get_random_image_of_given_label(images_set, labels_set, label):
     image_indexes = np.where(labels_set == label)
     rand_index = random.randint(0, np.bincount(labels_set)[label] - 1)
     return images_set[image_indexes][rand_index]
+
 
 def equalize_samples_set(X_set, y_set):
     labels_count_arr = np.bincount(y_set)
@@ -182,9 +192,7 @@ X_train, y_train = equalize_samples_set(X_train, y_train)
 
 ### Preprocess the data here. Preprocessing steps could include normalization, converting to grayscale, etc.
 # <codecell>
-import cv2
-import tensorflow as tf
-from tensorflow.contrib.layers import flatten
+
 
 def grayscale(img):
     return cv2.cvtColor(img, cv2.COLOR_RGB2GRAY)[:,:,None]
@@ -248,10 +256,9 @@ sample_image_processed_reshaped = np.reshape(sample_image_processed, dim1*dim2*d
 
 # <codecell>
 
-import tensorflow as tf
-from tensorflow.contrib.layers import flatten
 
-EPOCHS = 5
+
+EPOCHS = 50
 BATCH_SIZE = 128
 
 def LeNet(x):
@@ -348,7 +355,6 @@ def evaluate(X_data, y_data):
 # sets imply underfitting. A high accuracy on the training set but low accuracy on the validation set implies overfitting.
 
 # <codecell>
-from sklearn.utils import shuffle
 
 cost_arr = []
 
