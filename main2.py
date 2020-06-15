@@ -1,34 +1,14 @@
-# -*- coding: utf-8 -*-
-# <nbformat>3.0</nbformat>
-
-# <markdowncell>
-# # Self-Driving Car Engineer Nanodegree
-#
-# ## Deep Learning
-#
-# ## Project: Build a Traffic Sign Recognition Classifier
-#
-# <markdowncell>
-#
-# ## Step 0: Load The Data
-#
-# <codecell>
-
-# Load pickled data
 import pickle
 import numpy as np
 import matplotlib.pyplot as plt
 import random
-
 import tensorflow as tf
 from tensorflow.contrib.layers import flatten
-
 from tqdm import tqdm
-# from scipy import ndimage
 import cv2
-
 from sklearn.utils import shuffle
 
+# Load pickled data
 validation_file = "./data/valid.p"
 training_file = "./data/train.p"
 testing_file = "./data/test.p"
@@ -44,24 +24,6 @@ X_train, y_train = train['features'], train['labels']
 X_valid, y_valid = valid['features'], valid['labels']
 X_test, y_test = test['features'], test['labels']
 
-# <markdowncell>
-# ## Step 1: Dataset Summary & Exploration
-#
-# The pickled data is a dictionary with 4 key/value pairs:
-#
-# - `'features'` is a 4D array containing raw pixel data of the traffic sign images, (num examples, width, height, channels).
-# - `'labels'` is a 1D array containing the label/class id of the traffic sign. The file `signnames.csv` contains id -> name mappings for each id.
-# - `'sizes'` is a list containing tuples, (width, height) representing the original width and height the image.
-# - `'coords'` is a list containing tuples, (x1, y1, x2, y2) representing coordinates of a bounding box around the sign in the image. **THESE COORDINATES ASSUME THE ORIGINAL IMAGE. THE PICKLED DATA CONTAINS RESIZED VERSIONS (32 by 32) OF THESE IMAGES**
-#
-
-# <markdowncell>
-# ### Provide a Basic Summary of the Data Set Using Python, Numpy and/or Pandas
-
-# <codecell>
-
-# import numpy as np
-
 n_train = X_train.shape[0]
 n_valid = X_valid.shape[0]
 n_test = X_test.shape[0]
@@ -69,61 +31,12 @@ image_shape = X_train.shape[1:]
 
 n_classes = np.unique(y_train).shape[0]
 
-# print("Number of training examples =", n_train)
-# print("Number of validation examples =", n_valid)
-# print("Number of testing examples =", n_test)
-# print("Image data shape =", image_shape)
-# print("Number of classes =", n_classes)
-
-# # <markdowncell>
-# # ### Include an exploratory visualization of the dataset
-
-# # <codecell>
-
-# import numpy as np
-
-
-# # Visualizations will be shown in the notebook.
-
-# def draw_images_examples(image_array, grid_x, grid_y, title):
-#     fig = plt.figure(figsize=(grid_x,grid_y))
-#     fig.suptitle(title, fontsize=20)
-
-#     for i in range(1,grid_y*grid_x+1):
-#         index = random.randint(0, len(image_array))
-#         image = image_array[index].squeeze()
-
-#         plt.subplot(grid_y,grid_x,i)
-#         plt.imshow(image)
-
-# # draw_images_examples(X_train, 16, 4, 'Examples of images from training set')
-
-
-# fig = plt.figure(figsize=(12,4))
-# n, bins, patches = plt.hist(y_train, n_classes)
-# plt.xlabel('Labels')
-# plt.ylabel('No. of samples')
-# plt.title('Histogram of training samples')
-
-# X_train_one_label = X_train[np.where(y_train==0)]
-# # draw_images_examples(X_train_one_label, 16, 4, 'Examples of images of the same type - Speed limit (20km/h)')
-
-# <markdowncell>
-# ## Step 2: Design and Test a Model Architecture
-# <markdowncell>
-# ### Equalize histograms of training samples - by generation of additional, transformed images
-
-# <codecell>
-
-
-
 def augment_brightness_camera_images(image):
     image1 = cv2.cvtColor(image, cv2.COLOR_RGB2HSV)
     random_bright = .25 + np.random.uniform()
     image1[:, :, 2] = image1[:, :, 2]*random_bright
     image1 = cv2.cvtColor(image1, cv2.COLOR_HSV2RGB)
     return image1
-
 
 def transform_image(img,ang_range, shear_range, trans_range):
     ang_rot = np.random.uniform(ang_range)-ang_range/2
@@ -135,12 +48,10 @@ def transform_image(img,ang_range, shear_range, trans_range):
 
     return img
 
-
 def get_random_image_of_given_label(images_set, labels_set, label):
     image_indexes = np.where(labels_set == label)
     rand_index = random.randint(0, np.bincount(labels_set)[label] - 1)
     return images_set[image_indexes][rand_index]
-
 
 def equalize_samples_set(X_set, y_set):
     labels_count_arr = np.bincount(y_set)
@@ -165,34 +76,7 @@ def equalize_samples_set(X_set, y_set):
 
     return X_set, y_set
 
-
 X_train, y_train = equalize_samples_set(X_train, y_train)
-
-# n, bins, patches = plt.hist(y_train, n_classes)
-# plt.xlabel('Labels')
-# plt.ylabel('No. of samples')
-# plt.title('Equalized histogram of train samples')
-# plt.show()
-
-# print("Train set increased from {} to {}".format(n_train,X_train.shape[0]))
-
-
-# plt.imshow(X_train[1000])
-
-# grid_len = 4
-# plt.figure(figsize=(grid_len,grid_len))
-
-# for i in range(1,grid_len*grid_len+1):
-#     image = transform_image(X_train[1000], 20,10,5)
-#     plt.subplot(grid_len,grid_len,i)
-#     plt.imshow(image)
-
-
-# <markdowncell>
-
-### Preprocess the data here. Preprocessing steps could include normalization, converting to grayscale, etc.
-# <codecell>
-
 
 def grayscale(img):
     return cv2.cvtColor(img, cv2.COLOR_RGB2GRAY)[:,:,None]
@@ -208,8 +92,6 @@ def preprocess_image(image):
     img = normalize(img)
     return img
 
-
-from tqdm import tqdm
 def preprocess_batch(images):
     imgs = np.zeros(shape=images.shape)
     processed_image_depth = preprocess_image(images[0]).shape[2]
@@ -224,14 +106,6 @@ X_test_processed = preprocess_batch(X_test)
 
 sample_image = X_train[1000]
 sample_image_processed = grayscale(X_train[1000])
-#plt.figure(figsize=(16,3))
-#plt.subplot(131)
-#plt.imshow(sample_image)
-#plt.subplot(132)
-#plt.imshow(sample_image_processed.squeeze(), cmap='gray')
-
-#print("Sample image dimension BEFORE processing: {}".format(sample_image.shape))
-#print("Sample image dimension AFTER processing: {}".format(sample_image_processed.shape))
 
 image_depth = X_train_processed.shape[3]
 
@@ -239,8 +113,6 @@ dim1 = sample_image.shape[0]
 dim2 = sample_image.shape[1]
 dim3 = sample_image.shape[2]
 sample_image_reshaped = np.reshape(sample_image, dim1*dim2*dim3)
-#plt.figure(figsize=(16,3))
-#plt.subplot(131)
 n, bins, patches = plt.hist(sample_image_reshaped, 255)
 
 sample_image_processed =X_train_processed[1000]
@@ -248,15 +120,6 @@ dim1 = sample_image_processed.shape[0]
 dim2 = sample_image_processed.shape[1]
 dim3 = sample_image_processed.shape[2]
 sample_image_processed_reshaped = np.reshape(sample_image_processed, dim1*dim2*dim3)
-#plt.subplot(132)
-#n, bins, patches = plt.hist(sample_image_processed_reshaped,255)
-
-# <markdowncell>
-# ### Model Architecture
-
-# <codecell>
-
-
 
 EPOCHS = 50
 BATCH_SIZE = 128
@@ -347,14 +210,6 @@ def evaluate(X_data, y_data):
         accuracy = sess.run(accuracy_operation, feed_dict={x: batch_x, y: batch_y})
         total_accuracy += (accuracy * len(batch_x))
     return total_accuracy / num_examples
-
-# <markdowncell>
-# ### Train, Validate and Test the Model
-# <markdowncell>
-# A validation set can be used to assess how well the model is performing. A low accuracy on the training and validation
-# sets imply underfitting. A high accuracy on the training set but low accuracy on the validation set implies overfitting.
-
-# <codecell>
 
 cost_arr = []
 
